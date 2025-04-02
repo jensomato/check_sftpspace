@@ -20,13 +20,14 @@
 #####
 
 
-USAGE="Usage: check_sftpsace.sh -h [host] -u [user] [ -o sftpOption] -w [warn] -c [crit]"
+USAGE="Usage: check_sftpsace.sh -h [host] -u [user] -p [port] [ -o sftpOption] -w [warn] -c [crit]"
 
 if [ $# -ge 8 ]; then
-	while getopts "h:u:o::w:c:"  OPCOES; do
+	while getopts "h:u:p:o::w:c:"  OPCOES; do
 		case $OPCOES in
 			h ) SFTPHOST=$OPTARG;;
 			u ) SFTPUSER=$OPTARG;;
+			p ) SFTPPORT=$OPTARG;;
 			o ) SFTPOPTN=$OPTARG;;
 			w ) WARN=$OPTARG;;
 			c ) CRIT=$OPTARG;;
@@ -44,12 +45,11 @@ fi
 ## error handling
 type -P sftp &>/dev/null || { echo "ERROR: sftp is required but seems not to be installed.  Aborting." >&2; exit 1; }
 
-## sftp extra opt
-[ -z $SFTPOPTN ] && SFTPOPTN="port=22"
-
+## sftp port
+[ -z $SFTPPORT ] && SFTPPORT="22"
 
 ## get info and store
-RESULT=$(echo "df -h" | sftp -o $SFTPOPTN ${SFTPUSER}@${SFTPHOST} 2>&1 | tail -1 | column -t)
+RESULT=$(echo "df -h" | sftp -P $SFTPPORT -o $SFTPOPTN ${SFTPUSER}@${SFTPHOST} 2>&1 | tail -1 | column -t)
 read TOTAL USED AVAILABLE ROOT PERCENT <<< $RESULT
 PERCENT=$(expr 100 - ${PERCENT/\%/})
 
