@@ -49,7 +49,7 @@ type -P sftp &>/dev/null || { echo "ERROR: sftp is required but seems not to be 
 [ -z $SFTPPORT ] && SFTPPORT="22"
 
 ## get info and store
-RESULT=$(echo "df -h" | sftp -P $SFTPPORT -o $SFTPOPTN ${SFTPUSER}@${SFTPHOST} 2>&1 | tail -1 | column -t)
+RESULT=$(echo "df -h" | sftp -P $SFTPPORT -o $SFTPOPTN ${SFTPUSER}@${SFTPHOST} 2>&1 | tail -1 | tr -s ' ' | cut -d ' ' -f 2,3,4,5,6)
 read TOTAL USED AVAILABLE ROOT PERCENT <<< $RESULT
 PERCENT=$(expr 100 - ${PERCENT/\%/})
 
